@@ -35,6 +35,9 @@
             android:value="@string/google_maps_key" />
 
 
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".ResetPasswordActivity" />
+        <activity android:name=".HomeActivity"/>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

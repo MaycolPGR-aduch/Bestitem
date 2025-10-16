@@ -2,117 +2,86 @@ package com.example.bestitem;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log; // Importa la clase Log
-import android.view.View;
-import android.widget.Button; // Importa Button
-import android.widget.Toast; // Importa Toast
-
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
+import android.util.Patterns;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.*;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-// Importaciones de Firebase Firestore
-import com.example.bestitem.ui.businesslist.BusinessListActivity;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 
 public class MainActivity extends AppCompatActivity {
+    private FirebaseAuth auth;
+    private TextInputLayout tilEmail, tilPass;
+    private EditText etEmail, etPass;
+    private Button btnLogin;
+    private ProgressBar pb;
 
-    private static final String TAG = "MainActivity"; // Etiqueta para los logs
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() == null) {
-            auth.signInAnonymously()
-                    .addOnSuccessListener(r -> {/* listo */})
-                    .addOnFailureListener(e -> Log.e("Auth", "Anon sign-in failed", e));
+        auth = FirebaseAuth.getInstance();
+        tilEmail = findViewById(R.id.tilEmail);
+        tilPass  = findViewById(R.id.tilPass);
+        etEmail  = findViewById(R.id.etEmail);
+        etPass   = findViewById(R.id.etPass);
+        btnLogin = findViewById(R.id.btnLogin);
+        pb       = findViewById(R.id.pb);
+
+        btnLogin.setOnClickListener(v -> doLogin());
+        findViewById(R.id.tvRegister).setOnClickListener(v ->
+                startActivity(new Intent(this, RegisterActivity.class)));
+        findViewById(R.id.tvForgot).setOnClickListener(v ->
+                startActivity(new Intent(this, ResetPasswordActivity.class)));
+    }
+
+    @Override protected void onStart() {
+        super.onStart();
+        FirebaseUser current = auth.getCurrentUser();
+        if (current != null) goHome();
+    }
+
+    private void doLogin() {
+        tilEmail.setError(null); tilPass.setError(null);
+        String email = etEmail.getText().toString().trim();
+        String pass  = etPass.getText().toString().trim();
+
+        boolean ok = true;
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            tilEmail.setError("Correo inválido");
+            ok = false;
         }
+        if (pass.length() < 6){
+            tilPass.setError("Mínimo 6 caracteres");
+            ok = false;
+        }
+        if (!ok) return;
 
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main); // Asegúrate de tener un layout
-
-        Button btn = findViewById(R.id.btnOpenBusinesses);
-        btn.setOnClickListener(v ->
-                startActivity(new Intent(MainActivity.this, BusinessListActivity.class))
-        );
-
-        // Ejemplo: Añadir un botón a tu activity_main.xml con el id "myButton"
-        // <Button
-        //     android:id="@+id/myButton"
-        //     android:layout_width="wrap_content"
-        //     android:layout_height="wrap_content"
-        //     android:text="Guardar en Firestore" />
-
-        findViewById(R.id.btnOpenMap).setOnClickListener(v ->
-                startActivity(new Intent(MainActivity.this, com.example.bestitem.ui.map.BusinessMapActivity.class))
-        );
-
-
-        Button myButton = findViewById(R.id.myButton); // Asegúrate de tener este botón en tu XML
-
-        myButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                guardarDatosDeEjemplo();
+        setLoading(true);
+        auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(task -> {
+            setLoading(false);
+            if (task.isSuccessful()) {
+                new MaterialAlertDialogBuilder(MainActivity.this)
+                        .setTitle("¡Bienvenida!")
+                        .setMessage("Has iniciado sesión correctamente.")
+                        .setCancelable(false)
+                        .setPositiveButton("Continuar", (d, w) -> goHome())
+                        .show();
+            } else {
+                Toast.makeText(MainActivity.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
             }
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
     }
 
-    private void guardarDatosDeEjemplo() {
-        // 1. Obtener una instancia de la base de datos
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        //FirebaseFirestore db = FirebaseFirestore.getInstance(FirebaseApp.getInstance(), "bdbest");
+    private void setLoading(boolean loading){
+        btnLogin.setEnabled(!loading);
+        pb.setVisibility(loading ? android.view.View.VISIBLE : android.view.View.GONE);
+    }
 
-        // 2. Crear un nuevo "item" con un mapa de datos
-        Map<String, Object> item = new HashMap<>();
-        item.put("nombre", "Laptop Gamer XYZ");
-        item.put("precio", 1500);
-        item.put("disponible", true);
-
-        // 3. Añadir un nuevo documento con un ID generado automáticamente a la colección "items"
-        db.collection("items")
-                .add(item)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        // Se ejecutó correctamente
-                        Log.d(TAG, "Documento añadido con ID: " + documentReference.getId());
-                        Toast.makeText(MainActivity.this, "¡Item guardado en Firestore!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Ocurrió un error
-                        Log.w(TAG, "Error al añadir el documento", e);
-                        Toast.makeText(MainActivity.this, "Error al guardar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        FirebaseOptions opts = FirebaseApp.getInstance().getOptions();
-        Log.d("MainActivity", "Firebase projectId=" + opts.getProjectId()
-                + ", applicationId=" + opts.getApplicationId()
-                + ", gcmSenderId=" + opts.getGcmSenderId());
+    private void goHome(){
+        startActivity(new Intent(this, HomeActivity.class));
+        finish();
     }
 }
