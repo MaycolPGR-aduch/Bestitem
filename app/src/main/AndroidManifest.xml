@@ -20,6 +20,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Lista del CRUD -->
+        <activity android:name=".ui.businesslist.BusinessListActivity" android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".ui.businessform.BusinessFormActivity"/>
+
+        <activity android:name=".ui.map.BusinessMapActivity" android:exported="false"/>
+        <activity android:name=".ui.businessdetail.BusinessDetailActivity" android:exported="false"/>
+
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

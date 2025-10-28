@@ -1,5 +1,6 @@
 package com.example.bestitem;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log; // Importa la clase Log
 import android.view.View;
@@ -14,8 +15,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 // Importaciones de Firebase Firestore
+import com.example.bestitem.ui.businesslist.BusinessListActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -32,8 +35,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() == null) {
+            auth.signInAnonymously()
+                    .addOnSuccessListener(r -> {/* listo */})
+                    .addOnFailureListener(e -> Log.e("Auth", "Anon sign-in failed", e));
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main); // Asegúrate de tener un layout
+
+        Button btn = findViewById(R.id.btnOpenBusinesses);
+        btn.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, BusinessListActivity.class))
+        );
 
         // Ejemplo: Añadir un botón a tu activity_main.xml con el id "myButton"
         // <Button
@@ -41,6 +57,11 @@ public class MainActivity extends AppCompatActivity {
         //     android:layout_width="wrap_content"
         //     android:layout_height="wrap_content"
         //     android:text="Guardar en Firestore" />
+
+        findViewById(R.id.btnOpenMap).setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, com.example.bestitem.ui.map.BusinessMapActivity.class))
+        );
+
 
         Button myButton = findViewById(R.id.myButton); // Asegúrate de tener este botón en tu XML
 

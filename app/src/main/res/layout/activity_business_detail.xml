@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent" android:layout_height="match_parent" android:padding="16dp">
+        <LinearLayout
+            android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imgCover"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/app_name" />
+
+            <TextView
+                android:id="@+id/txtName"
+                android:textStyle="bold" android:textSize="20sp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"/>
+
+            <TextView
+                android:id="@+id/txtCategory"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/txtAddress"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/txtPhone"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/txtDescription"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp">
+
+                <Button
+                    android:id="@+id/btnCall"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="Llamar" />
+
+                <Button
+                    android:id="@+id/btnNavigate"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="Ir (Maps)"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
