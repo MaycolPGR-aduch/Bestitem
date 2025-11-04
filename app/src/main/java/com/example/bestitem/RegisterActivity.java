@@ -111,6 +111,8 @@ public class RegisterActivity extends AppCompatActivity {
                                 finishAffinity();
                             })
                             .show();
+
+                    
                 })
                 .addOnFailureListener(e -> {
                     setLoading(false);

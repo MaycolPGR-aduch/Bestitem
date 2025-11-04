@@ -30,7 +30,7 @@ public class HomeActivity extends AppCompatActivity {
 
         btnLogout.setOnClickListener(v -> {
             auth.signOut();
-            Intent i = new Intent(this, MainActivity.class);
+            Intent i = new Intent(this, LoginActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
             finish();
@@ -40,7 +40,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override protected void onStart() {
         super.onStart();
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, LoginActivity.class));
             finish();
         }
     }

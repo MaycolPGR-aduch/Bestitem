@@ -10,7 +10,7 @@ import com.google.firebase.auth.*;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private TextInputLayout tilEmail, tilPass;
     private EditText etEmail, etPass;
@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
         auth = FirebaseAuth.getInstance();
         tilEmail = findViewById(R.id.tilEmail);
@@ -62,14 +62,14 @@ public class MainActivity extends AppCompatActivity {
         auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(task -> {
             setLoading(false);
             if (task.isSuccessful()) {
-                new MaterialAlertDialogBuilder(MainActivity.this)
+                new MaterialAlertDialogBuilder(LoginActivity.this)
                         .setTitle("¡Bienvenida!")
                         .setMessage("Has iniciado sesión correctamente.")
                         .setCancelable(false)
                         .setPositiveButton("Continuar", (d, w) -> goHome())
                         .show();
             } else {
-                Toast.makeText(MainActivity.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
             }
         });
 
